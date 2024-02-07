@@ -13,11 +13,12 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package com.hivemq.extensions.helloworld;
+package com.hivemq.extensions.puback;
 
 import com.hivemq.extension.sdk.api.ExtensionMain;
 import com.hivemq.extension.sdk.api.annotations.NotNull;
 import com.hivemq.extension.sdk.api.events.EventRegistry;
+import com.hivemq.extension.sdk.api.interceptor.puback.PubackOutboundInterceptor;
 import com.hivemq.extension.sdk.api.parameter.*;
 import com.hivemq.extension.sdk.api.services.Services;
 import com.hivemq.extension.sdk.api.services.intializer.InitializerRegistry;
@@ -43,7 +44,15 @@ public class HelloWorldMain implements ExtensionMain {
 
         try {
             addClientLifecycleEventListener();
-            addPublishModifier();
+            //addPublishModifier();
+
+            final PubackOutboundInterceptor interceptor = (pubackOutboundInput, pubackOutboundOutput) -> {
+                log.debug("intercepted a PUBACK packet.");
+            };
+
+            Services.initializerRegistry().setClientInitializer((initializerInput, clientContext) -> {
+                clientContext.addPubackOutboundInterceptor(interceptor);
+            });
 
             final ExtensionInformation extensionInformation = extensionStartInput.getExtensionInformation();
             log.info("Started " + extensionInformation.getName() + ":" + extensionInformation.getVersion());
