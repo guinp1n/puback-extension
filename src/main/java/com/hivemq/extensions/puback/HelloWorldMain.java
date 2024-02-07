@@ -47,10 +47,15 @@ public class HelloWorldMain implements ExtensionMain {
             //addPublishModifier();
 
             final PubackOutboundInterceptor interceptor = (pubackOutboundInput, pubackOutboundOutput) -> {
-                log.debug("intercepted a PUBACK packet.");
+                log.info("====================intercepted a PUBACK packet.=======================");
+                try {
+                    Thread.sleep(10000);
+                } catch (InterruptedException e) {
+                    throw new RuntimeException(e);
+                }
             };
 
-            Services.initializerRegistry().setClientInitializer((initializerInput, clientContext) -> {
+            Services.initializerRegistry().setClientInitializer((initializerInput,   clientContext) -> {
                 clientContext.addPubackOutboundInterceptor(interceptor);
             });
 
